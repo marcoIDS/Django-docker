@@ -1,15 +1,8 @@
-    
-FROM python:alpine3.7
-
-
-ENV PYTHONUNBUFFERED 1
-
-RUN mkdir /code
-
-WORKDIR /code
-
-ADD requirements.txt /code/
-
-RUN pip install -r requirements.txt
-
-ADD . /code/
+FROM python:latest
+MAINTAINER django_service
+ADD . /usr/src/app
+WORKDIR /usr/src/app
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+EXPOSE 8000
+CMD exec gunicorn api.wsgi:application --bind 0.0.0.0:8000 --workers 3

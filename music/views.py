@@ -11,23 +11,22 @@ from rest_framework import status
 from django.http import Http404
 
 class ListSongsView(APIView):
-
     def get(self, request, format=None):
         song = Songs.objects.all()
         serializer = SongsSerializer(song, many=True)
         return Response({"songs": serializer.data})
     
     def post(self, request, format=None):
-        song = request.data.get('song')
+        song = request.data
         # Create an article from the above data
         serializer = SongsSerializer(data=song)
-        if serializer.is_valid(raise_exception=True):
+        if serializer.is_valid():
             song_saved = serializer.save()
             datas = serializer.data
             response = datas
-            return Response(response, status=status.HTTP_201_CREATED)
+            return Response(response)
         response = serializer.errors
-        return Response(response, status=status.HTTP_404_BAD_REQUEST)
+        return Response(response)
         #return Response({"success": "SONG '{}' created successfully".format(song_saved.id)})
 
     def update(self, instance, validated_data):
@@ -38,7 +37,7 @@ class ListSongsView(APIView):
     
     def put(self, request, pk):
         saved_song = get_object_or_404(Songs.objects.all(), pk=pk)
-        data = request.data.get('song')
+        data = request.data
         serializer = SongsSerializer(instance=saved_song, data=data, partial=True)
 
         if serializer.is_valid(raise_exception=True):
